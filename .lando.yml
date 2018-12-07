@@ -1,0 +1,70 @@
+name: laravel-clinic-locator
+recipe: laravel
+config:
+  php: "7.2"
+  xdebug: true
+  webroot: web/public
+  via: nginx
+proxy:
+  edge:
+    - edge.laravelcliniclocator.lndo.site
+  phpmyadmin:
+    - phpmyadmin.laravelcliniclocator.lndo.site
+  mailhog:
+    - mail.laravelcliniclocator.lndo.site
+  redis:
+    - redis.laravelcliniclocator.lndo.site
+  elasticsearch:
+    - elasticsearch.laravelcliniclocator.lndo.site
+services:
+  database:
+    type: mariadb
+    portforward: 3306
+    creds:
+      user: laravel
+      password: laravel
+      database: laravel
+  phpmyadmin:
+    type: phpmyadmin
+    hosts:
+      - database
+  mailhog:
+    type: mailhog
+    hogfrom:
+      - appserver
+  redis:
+    type: redis
+    persist: true
+  edge:
+    type: varnish
+    backends:
+      - nginx
+    ssl: true
+  node:
+    type: node
+    globals:
+      gulp-cli: "latest"
+  elasticsearch:
+    type: elasticsearch
+tooling:
+  gulp:
+    service: node
+  node:
+    service: node
+  npm:
+    service: node
+  phpunit:
+    service: appserver
+  varnishadm:
+    service: edge
+    user: root
+  varnishstat:
+    service: edge
+    user: root
+  varnishlog:
+    service: edge
+    user: root
+  vim:
+    service: appserver
+  yarn:
+    service: node
